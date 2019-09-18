@@ -1,0 +1,255 @@
+SELECT P.TEAM_ID, P.BACK_NO, P.PLAYER_NAME, T.TEAM_NAME
+FROM PLAYER P, TEAM T
+WHERE P.TEAM_ID LIKE T.TEAM_ID
+    AND P.POSITION LIKE 'GK'
+ORDER BY P.TEAM_ID, P.BACK_NO
+;
+
+SELECT P.TEAM_ID, P.BACK_NO, P.PLAYER_NAME, T.TEAM_NAME
+FROM PLAYER P JOIN TEAM T
+    ON P.TEAM_ID LIKE T.TEAM_ID
+WHERE P.POSITION LIKE 'GK'
+ORDER BY P.TEAM_ID, P.BACK_NO
+;
+
+--29. 선수 테이블과 팀 테이블에서 선수 이름과 소속된 팀의 이름을 출력하시오.
+--답 282P
+SELECT P.PLAYER_NAME, T.TEAM_NAME
+FROM PLAYER P JOIN TEAM T
+ON P.TEAM_ID LIKE T.TEAM_ID
+;
+
+--30. 포지션이 골기퍼(GK)인 선수들에 대한 데이터만 백넘버 순으로 출력하시오.
+--답 286P
+SELECT P.BACK_NO, P.POSITION, P.PLAYER_NAME
+FROM PLAYER P JOIN TEAM T
+ON P.TEAM_ID LIKE T.TEAM_ID
+WHERE P.POSITION LIKE 'GK'
+ORDER BY P.BACK_NO
+;
+
+--31. 팀과 구장 테이블을 이용해 REGION_NAME 연고지, TEAM_NAME 팀명, STADUIM_NAME 구장명, SEAT_COUNT 좌석수를 출력하시오. 답 289P
+SELECT T.REGION_NAME 연고지, T.TEAM_NAME 팀명, S.STADIUM_NAME 구장명, S.SEAT_COUNT 좌석수
+FROM STADIUM S JOIN TEAM T
+ON S.STADIUM_ID LIKE T.STADIUM_ID
+;
+
+--32. 선수와 팀과 구장 테이블을 이용하여 선수명, 포지션, 연고지, 팀명, 구장명을 출력하시오. 
+--답 293P
+SELECT P.PLAYER_NAME 선수명, P.POSITION 포지션, 
+    T.REGION_NAME 연고지, T.TEAM_NAME 팀명, S.STADIUM_NAME 경기장
+FROM PLAYER P NATURAL JOIN TEAM T 
+    NATURAL JOIN STADIUM S
+;
+
+SELECT P.PLAYER_NAME 선수명, P.POSITION 포지션, 
+    T.REGION_NAME 연고지, T.TEAM_NAME 팀명, S.STADIUM_NAME 경기장
+FROM PLAYER JOIN TEAM T
+    USING(TEAM_ID)
+    JOIN STADIUM S
+    USING(STADIUM_ID)
+;
+
+--33 선수와 팀과 구장 테이블을 이용하여 선수명, 포지션, 연고지, 팀명을 출력하시오
+--단, NATURAL JOIN 을 사용하시오.
+
+SELECT P.PLAYER_NAME 선수명, P.POSITION 포지션, 
+        T.REGION_NAME 연고지, T.TEAM_NAME 팀명
+FROM PLAYER P NATURAL JOIN TEAM T
+    NATURAL JOIN STADIUM S
+;
+
+--34.  선수와 팀과 구장 테이블을 이용하여 선수명, 포지션, 연고지, 팀명, 구장명을 출력하시오. 
+--단, USING 을 사용하시오. 
+SELECT P.PLAYER_NAME 선수명, P.POSITION 포지션, 
+        T.REGION_NAME 연고지, T.TEAM_NAME 팀명
+FROM PLAYER P JOIN TEAM T
+    USING(TEAM_ID)
+    JOIN STADIUM S
+    USING (STADIUM_ID)
+;
+
+
+--35. 스타디움 테이블에서 홈팀이 없는 경기장도 있다. STADIUM 과  TEAM 을 JOIN 하되,
+--홈팀이 없는 경기장의 정보를 같이 출력하시오.
+SELECT S.STADIUM_NAME, S.DDD, S.HOMETEAM_ID
+FROM STADIUM S LEFT JOIN TEAM T
+    ON S.HOMETEAM_ID LIKE T.TEAM_ID
+ORDER BY HOMETEAM_ID;
+
+--36. K리그 선수들 중에서 소속이 삼성블루윙즈팀인(K02) 와 전남드래곤즈(K07) 팀인 선수들을
+--모두 보고 싶다. 
+--단) 집합연산자를 사용하시오.
+--답 333P
+SELECT PLAYER_NAME
+FROM PLAYER
+WHERE TEAM_ID LIKE 'K02'
+UNION
+SELECT PLAYER_NAME
+FROM PLAYER
+WHERE TEAM_ID LIKE 'K07'
+ORDER BY 1;
+
+
+--37. K리그 선수들 중에서 소속이 삼성블루윙즈팀인(K02) 와 전남드래곤즈(K07) 팀인 선수들을
+--모두 보고 싶다. 
+--단) IN 이나 OR 를 사용하시오.
+--답 333P
+SELECT PLAYER_NAME
+FROM PLAYER
+WHERE TEAM_ID LIKE 'K02' OR TEAM_ID LIKE 'K07';
+
+SELECT PLAYER_NAME
+FROM PLAYER
+WHERE TEAM_ID IN ('K02','K07');
+--38. K 리그 소속 선수 중 삼성블루윙즈 팀이면서 포지션이 MF가 아닌 선수들을 출력하시오
+--단) 집합연산자를 사용하시오.
+--답 339P 
+SELECT PLAYER_NAME, POSITION
+FROM PLAYER
+WHERE TEAM_ID = 'K02'
+MINUS
+SELECT PLAYER_NAME, POSITION
+FROM PLAYER
+WHERE POSITION = 'MF'
+ORDER BY 2,1;
+
+
+--39. K 리그 소속 선수 중 삼성블루윙즈 팀이면서 포지션이 MF가 아닌 선수들을 출력하시오
+--단) 집합연산자를 사용하지 마시오.
+--답 339P 
+SELECT POSITION, PLAYER_NAME
+FROM PLAYER
+WHERE TEAM_ID LIKE 'K02'
+AND POSITION <>'MF'
+ORDER BY 1,2;
+
+--40. K 리그 소속 선수 중 삼성블루윙즈 팀이면서 포지션이 GK인  선수들을 출력하시오
+--단) 집합연산자를 사용하시오 
+--답 341
+SELECT POSITION, PLAYER_NAME
+FROM PLAYER 
+WHERE TEAM_ID LIKE 'K02'
+INTERSECT  
+SELECT POSITION, PLAYER_NAME
+FROM PLAYER
+WHERE POSITION LIKE 'GK'
+;
+
+--41. K 리그 소속 선수 중 삼성블루윙즈 팀이면서 포지션이 GK인  선수들을 출력하시오
+--단) INNER JOIN을 사용하시오 
+--답 341 
+SELECT P.POSITION, P.PLAYER_NAME
+FROM PLAYER P JOIN TEAM T
+ON P.TEAM_ID LIKE T.TEAM_ID
+WHERE P.POSITION LIKE 'GK'
+AND T.TEAM_NAME LIKE '삼성%'
+ORDER BY 1;
+
+--42. K 리그 소속 선수 중 삼성블루윙즈 팀이면서 포지션이 GK인  선수들을 출력하시오
+--단) IN 을 사용하시오
+--답 341 
+SELECT POSITION, PLAYER_NAME
+FROM PLAYER
+WHERE TEAM_ID LIKE 'K02'
+AND POSITION IN ('GK')
+ORDER BY 1,2;
+
+--43. K 리그 소속 선수 중 삼성블루윙즈 팀이면서 포지션이 GK인  선수들을 출력하시오
+--단) SUBQUERY 을 사용하시오
+--답 342
+SELECT POSITION, PLAYER_NAME
+FROM PLAYER
+WHERE TEAM_ID LIKE 'K02'
+AND PLAYER_ID IN (SELECT PLAYER_ID
+                    FROM PLAYER
+                    WHERE POSITION LIKE 'GK')
+ORDER BY 1,2;
+
+--46. 정남일 선수가 소속된 팀의 선수들의 선수명, 포지션, 백넘버를 출력하시오. ( 서브쿼리 사용 )
+--답 357P
+SELECT PLAYER_NAME, POSITION, BACK_NO
+FROM PLAYER
+WHERE TEAM_ID LIKE (SELECT TEAM_ID
+                FROM PLAYER
+                WHERE PLAYER_NAME LIKE '정남일');
+
+--47. 선수들의 평균키보다 작은 선수들의 선수명, 포지션, 백넘버를 출력하시오. ( 서브쿼리 사용 )
+--답 359P
+SELECT PLAYER_NAME, POSITION, BACK_NO
+FROM PLAYER
+        WHERE HEIGHT <= (SELECT AVG(HEIGHT)
+        FROM PLAYER)
+ORDER BY PLAYER_NAME;
+
+--48. 소속팀별로 키가 가장 작은 사람들의 팀아이디, 선수명, 포지션, 백넘버, 키 를 출력하시오 ( 서브쿼리 사용)
+--답 361P
+SELECT PLAYER_NAME, POSITION, BACK_NO, HEIGHT
+FROM PLAYER
+    WHERE (TEAM_ID, HEIGHT) IN
+    (SELECT TEAM_ID, MIN(HEIGHT)
+    FROM PLAYER
+    GROUP BY TEAM_ID)
+ORDER BY TEAM_ID,PLAYER_NAME;
+
+--49. 선수 자신이 속한 팀의 평균 키보다 작은 선수들의 
+--팀명, 선수명, 포지션, 백넘버, 키 를 출력하시오. ( 서브쿼리 )
+--답 362P
+SELECT T.TEAM_NAME 팀명, M.PLAYER_NAME 선수명, M.POSITION 포지션, 
+       M.BACK_NO 백넘버, M.HEIGHT 키
+FROM PLAYER M JOIN TEAM T
+    ON M.TEAM_ID LIKE T.TEAM_ID
+WHERE M.HEIGHT < (SELECT AVG(S.HEIGHT)
+                  FROM PLAYER S
+                  WHERE S.TEAM_ID LIKE M.TEAM_ID
+                    AND S.HEIGHT IS NOT NULL
+                  GROUP BY S.TEAM_ID)
+ORDER BY 2;
+
+--기타
+SELECT T.TEAM_NAME 팀이름 , ROUND(AVG(S.HEIGHT),2)평균키
+FROM PLAYER S JOIN TEAM T
+    ON S.TEAM_ID LIKE T.TEAM_ID
+WHERE S.HEIGHT IS NOT NULL
+GROUP BY S.TEAM_ID, T.TEAM_NAME;
+                  
+--50. 선수의 소속팀별 평균키를 출력하시오. ( 스칼라 사용 )
+--답 364P
+SELECT PLAYER_NAME 선수명, HEIGHT 키,
+      ROUND((SELECT AVG(HEIGHT)
+               FROM PLAYER X
+               WHERE X.TEAM_ID LIKE P.TEAM_ID),2)팀평균키 
+FROM PLAYER P;
+
+--51. 선수들 중 포지션이 미드필더 (MF) 인 선수들의 
+--소속 팀명, 선수명, 백넘버를 출력하시오 ( 인라인뷰 사용 )
+--답 364P
+SELECT T.TEAM_NAME 팀명, P.PLAYER_NAME 선수명, P.BACK_NO 백넘버
+FROM(SELECT TEAM_ID, PLAYER_NAME, BACK_NO 
+    FROM PLAYER 
+    WHERE POSITION LIKE 'MF')P,
+    TEAM T
+WHERE P.TEAM_ID LIKE T.TEAM_ID
+ORDER BY 선수명;
+
+--52. 전체 선수들 중에서 키가 NULL 이 아닌 선수를 키순으로 정렬할 때, 
+--가장 키가 큰 선수 5명의 선수명, 포지션, 백넘버, 키를 출력하시오. ( 인라인뷰 사용 )
+--답 365P
+SELECT PLAYER_NAME, POSITION, BACK_NO, HEIGHT
+FROM (SELECT PLAYER_NAME, POSITION, BACK_NO, HEIGHT
+        FROM PLAYER
+        WHERE HEIGHT IS NOT NULL
+        ORDER BY HEIGHT DESC)
+WHERE ROWNUM <=5;
+
+
+--53. 평균키가 삼성 블루윙즈(K02) 팀의 평균키보다 작은 팀의 
+--팀아이디와 팀이름과 해당 팀의 평균키를 출력하시오.
+--답 366P
+SELECT T.TEAM_ID, T.TEAM_NAME, AVG(P.HEIGHT)
+FROM TEAM T JOIN PLAYER P
+    ON T.TEAM_ID LIKE P.TEAM_ID
+GROUP BY P.TEAM_ID, T.TEAM_NAME
+HAVING AVG(P.HEIGHT) < (SELECT AVG(HEIGHT)
+                            FROM PLAYER
+                            WHERE TEAM_ID LIKE 'K02');

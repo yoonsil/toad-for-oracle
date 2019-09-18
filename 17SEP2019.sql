@@ -1,0 +1,164 @@
+--1
+SELECT PLAYER_ID, PLAYER_NAME, TEAM_ID, 
+POSITION, HEIGHT, WEIGHT, BACK_NO
+FROM PLAYER
+;
+--2
+SELECT DISTINCT POSITION FROM PLAYER;
+--3
+SELECT * FROM PLAYER;
+--4
+SELECT PLAYER_NAME 선수, POSITION 위치,HEIGHT 키, WEIGHT 몸무게
+FROM PLAYER;
+--5
+SELECT PLAYER_NAME "선수 이름", POSITION "그라운드 포지션",HEIGHT 키, WEIGHT 몸무게
+FROM PLAYER;
+--6
+SELECT PLAYER_NAME 선수이름, HEIGHT-WEIGHT "키-몸무게"
+FROM PLAYER;
+--7
+SELECT PLAYER_NAME 선수이름, ROUND(WEIGHT/((HEIGHT/100)*(HEIGHT/100)),2)
+"BMI 비만지수"
+FROM PLAYER;
+--8
+SELECT PLAYER_NAME||'선수,'|| HEIGHT||'cm,'||WEIGHT||'kg' 체격정보
+FROM PLAYER;
+--9
+SELECT PLAYER_NAME 
+FROM PLAYER
+WHERE POSITION LIKE 'MF' AND HEIGHT BETWEEN 170 AND 180;
+
+--10
+SELECT PLAYER_NAME, POSITION, BACK_NO, HEIGHT
+FROM PLAYER
+WHERE PLAYER_NAME LIKE '장%'
+;
+
+--11
+SELECT PLAYER_NAME, POSITION, BACK_NO
+FROM PLAYER
+WHERE POSITION IS NULL
+;
+
+--12
+SELECT PLAYER_NAME, POSITION, BACK_NO
+FROM PLAYER
+WHERE TEAM_ID = 'K02'
+AND POSITION <> 'MF'
+AND HEIGHT NOT BETWEEN 170 AND 180;
+
+--13 국적이 외국인인 선수들의 선수이름, 국적을 출력하시오
+SELECT PLAYER_NAME, NATION
+FROM PLAYER
+WHERE NATION IS NOT NULL;
+
+--14  PLAYER_ID 와 선수명을 출력하시오. (단 CONCAT 함수를 사용하시오) 
+SELECT CONCAT (PLAYER_ID, PLAYER_NAME)
+FROM PLAYER; 
+
+--15. 경기장의 지역번호와 전화번호를 합친 번호를 TEL이라는 컬럼명으로 , STADIUM_ID 와 함께 출력하시오.
+SELECT STADIUM_ID, DDD||'-'||TEL AS TEL
+FROM STADIUM;
+;
+--16. 오늘 날짜를 2019-09-17 화요일 로 출력하시오.
+SELECT TO_CHAR(SYSDATE,'YYYY-MM-DD DAY')오늘날짜
+FROM DUAL;
+;
+--17. 팀테이블의 ZIP 코드1 과 ZIP 코드2 를 숫자로 변환한 후, 두 항목을 두한 숫자를 우편번호함 컬럼명으로 출력하시오.
+
+SELECT * 
+FROM STADIUM
+ORDER BY STADIUM_NAME;
+--18 선수들 중 180이상이면 장신, 이하면 단신으로 해서, 이름과 같이 출력하시오.
+SELECT PLAYER_NAME 이름,
+    CASE WHEN HEIGHT >=180
+    THEN ('장신')
+    ELSE ('단신')
+    END 키
+FROM PLAYER;
+
+--19. 수원 블루윙즈 선수들 중 포지션이 있으면 포지션을 없으면 없음으로 표시한 후 선수명과 함께 출력하시오.
+SELECT PLAYER_NAME 선수명,
+    CASE WHEN POSITION IS NOT NULL
+    THEN ('있음')
+    ELSE ('없음')
+    END POSITION
+FROM PLAYER;
+
+--20 스타디움 이름을 오름차순하여 순번을 붙인 후 상위 10 경기장만 출력하시오.
+SELECT ROWNUM, T.*
+   FROM(SELECT *
+    FROM STADIUM
+    ORDER BY STADIUM_NAME)T
+ WHERE ROWNUM <=10
+    ;
+--21 k리그에서 뛰는 선수들의 총 수를 "전체 선수인원" , 최대키, 최소키, 평균키를 출력하시오.
+SELECT COUNT(*) "전체 선수인원",
+    MAX(HEIGHT) 최대키,
+    MIN(HEIGHT) 최소키,
+    ROUND(AVG(HEIGHT),2)평균키
+    FROM PLAYER;
+
+--22. 포지션별 인원수, 최대키, 최소기, 평균키를 출력하시오
+
+SELECT POSITION 포지션, COUNT(*) 인원수,
+    MAX(HEIGHT),
+    MIN(HEIGHT),
+    ROUND(AVG(HEIGHT),2) 평균키
+FROM PLAYER
+GROUP BY POSITION
+;
+
+--23. 포지션 중에서 평균키가 180 이상인 포지션과 평균키를 출력하시오.
+SELECT POSITION 포지션, 
+ROUND(AVG(HEIGHT),2) 평균키
+FROM PLAYER
+GROUP BY POSITION
+HAVING AVG (HEIGHT)>=180;
+
+--24. K리그 선수들 중 삼성 블루윙즈(K02) 와 FC서울(K09)의 인원수는 얼마인가?
+SELECT TEAM_ID 팀ID, COUNT(*) 인원수
+FROM PLAYER
+WHERE TEAM_ID IN ('K02','K09')
+GROUP BY TEAM_ID;
+;
+--25. 포지션별 평균키만 출력하는데, 최대키가 190cm 이상인 선수를 가지고 있는 포지션과 평균키만 출력하시오.
+SELECT POSITION, ROUND(AVG(HEIGHT),2) 평균키
+FROM PLAYER
+GROUP BY POSITION
+HAVING MAX(HEIGHT)>=190;
+
+--26. 팀별 포지션별 FW, MF, DF, GK 포지션의 인원수와 팀별 전체 인원수를 출력하시오.
+SELECT TEAM_ID,
+NVL(SUM(CASE POSITION WHEN 'FW' THEN '1' END),0) FW,
+NVL(SUM(CASE POSITION WHEN 'MF' THEN '1' END),0) MF,
+NVL(SUM(CASE POSITION WHEN 'DF' THEN '1' END),0) DF,
+NVL(SUM(CASE POSITION WHEN 'GK' THEN '1' END),0) GK,
+COUNT(*) SUM
+FROM PLAYER
+GROUP BY TEAM_ID
+ORDER BY TEAM_ID;
+
+--27. 선수테이블에서 선수들의 이름, 포지션, 백넘버를 사람 이름 내림차순으로 정렬하여 출력하시오.
+--답 269P
+SELECT PLAYER_NAME 이름, POSITION 포지션, BACK_NO
+FROM PLAYER
+ORDER BY PLAYER_NAME DESC;
+
+--28. 선수테이블에서 선수들의 이름, 포지션, 백넘버를 출력하는데 선수들의 백넘버 내림차순, 
+--백넘버가 같은 경우 포지션, 포지션까지 같은 경우 선수명 순서로 출력한다. 
+--백넘버가 NULL 인 경우는 제외한다. 
+--답 272P
+SELECT PLAYER_NAME, POSITION, BACK_NO
+FROM PLAYER
+WHERE BACK_NO IS NOT NULL
+ORDER BY BACK_NO DESC, POSITION,PLAYER_NAME;
+
+--29. 선수 테이블과 팀 테이블에서 선수 이름과 소속된 팀의 이름을 출력하시오.
+--답 282P
+
+
+
+--30. 포지션이 골기퍼(GK)인 선수들에 대한 데이터만 백넘버 순으로 출력하시오.
+--답 286P
+
